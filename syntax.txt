@@ -10,8 +10,9 @@ Implicit types
 ''	Literal
 ""	Literal
 ;	End of line
-	: x '5';
-	: abc "c";
+	example:
+		: x '5';
+		: abc "c";
 
 +	Add
 -	Subtract
@@ -30,8 +31,9 @@ Implicit types
 #	Xor
 
 _	Character / String concatenation
-	'a'_'b';
-	abc_xyz;
+	example:
+		'a'_'b';
+		abc_xyz;
 
 Note:
 * denotes wildcard values
@@ -39,14 +41,15 @@ Note:
 
 * *...{}	Function definition
 ^	Return value
-example:
-	functionName arg1 arg2 {
-		^ + arg1 arg2;
-	}
+	example:
+		functionName arg1 arg2 {
+			^ + arg1 arg2;
+		}
 
 ()	Invoke procedure
-	doSomething();
-	doSomethingWithThis(arg1 arg2);
+	example:
+		doSomething();
+		doSomethingWithThis(arg1 arg2);
 
 Note:
 Conditional statements accept a single Boolean, which is actually an Integer.
@@ -56,56 +59,57 @@ Any non-0 number evaluates to TRUE
 * ?{}	If statement definition
 } * {	Else if
 } {		Else
-example:
-	> 3 0 ?{
-		^'probably';
-	} = 3 0 {
-		^'maybe';
-	} {
-		^'nope';
-	}
+	example:
+		> 3 0 ?{
+			^'probably';
+		} = 3 0 {
+			^'maybe';
+		} {
+			^'nope';
+		}
 
 !{} While loop definition
-example:
-	: i 10
-	> i 0 !{
-		: i - i 1;
-	}
+	example:
+		: i 10
+		> i 0 !{
+			: i - i 1;
+		}
 	
 .{}	Array definitiion
-example:
-	: array .{'0' '1' '2'}
-example:
-	: array .{
-		'0'
-		'1'
-		'2'
-	}
+	example:
+		: array1 .{'0' '1' '2'}
+		: array2 .{
+			'0'
+			'1'
+			'2'
+		}
 
 *.*	Fetch element at specified Integer index
-example:
-	array.0;
+	example:
+		array.0;
 
 If time permits:
 	Pointers:
 		@	Dereference
-		example:
-			@ 0x1234
+			example:
+				@ 0x1234
 
 		$	Address of variable
-		example:
-			$ var1
+			example:
+				$ var1
 	
 	Objects:
 		Note:
 		Constructor methods begin with a capital letter
 		.{}	Object constructor definition
-			Object arg1 arg2 .{
-				: x arg1;
-				: y arg2;
-			}
+			example:
+				Object arg1 arg2 .{
+					: x arg1;
+					: y arg2;
+				}
 
 		*.* Fetch value of the specified field of the object
-			: obj1 Object('x' 'y');
-			obj1.x;
-			obj2.y;
+			example:
+				: obj1 Object('x' 'y');
+				obj1.x;
+				obj2.y;
