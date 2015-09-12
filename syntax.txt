@@ -1,0 +1,111 @@
+Prefix notation
+Implicit types
+	Character
+	Integer
+	Boolean (not an actual type - constant that resolves to an Integer)
+		TRUE -> 1
+		FALSE -> 0
+
+:	var initialization
+''	Literal
+""	Literal
+;	End of line
+	: x '5';
+	: abc "c";
+
++	Add
+-	Subtract
+*	Multiply
+/	Divide
+%	Mod
+=	Equal
+<	Less than
+>	Greater than
+<=	Less than or equal
+>=	Greater than or equal
+
+&	And
+|	Or
+~	Not
+#	Xor
+
+_	Character / String concatenation
+	'a'_'b';
+	abc_xyz;
+
+Note:
+* denotes wildcard values
+... denotes an arbitrary number of values
+
+* *...{}	Function definition
+^	Return value
+example:
+	functionName arg1 arg2 {
+		^ + arg1 arg2;
+	}
+
+()	Invoke procedure
+	doSomething();
+	doSomethingWithThis(arg1 arg2);
+
+Note:
+Conditional statements accept a single Boolean, which is actually an Integer.
+Any non-0 number evaluates to TRUE
+0 evaluates to FALSE.
+
+* ?{}	If statement definition
+} * {	Else if
+} {		Else
+example:
+	> 3 0 ?{
+		^'probably';
+	} = 3 0 {
+		^'maybe';
+	} {
+		^'nope';
+	}
+
+!{} While loop definition
+example:
+	: i 10
+	> i 0 !{
+		: i - i 1;
+	}
+	
+.{}	Array definitiion
+example:
+	: array .{'0' '1' '2'}
+example:
+	: array .{
+		'0'
+		'1'
+		'2'
+	}
+
+*.*	Fetch element at specified Integer index
+example:
+	array.0;
+
+If time permits:
+	Pointers:
+		@	Dereference
+		example:
+			@ 0x1234
+
+		$	Address of variable
+		example:
+			$ var1
+	
+	Objects:
+		Note:
+		Constructor methods begin with a capital letter
+		.{}	Object constructor definition
+			Object arg1 arg2 .{
+				: x arg1;
+				: y arg2;
+			}
+
+		*.* Fetch value of the specified field of the object
+			: obj1 Object('x' 'y');
+			obj1.x;
+			obj2.y;
