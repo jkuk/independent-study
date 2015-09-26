@@ -7,27 +7,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Lexer {
-	private char LEFT_PARENTHESIS = '(';
-	private char RIGHT_PARENTHESIS = ')';
-	private char LEFT_BRACKET = '[';
-	private char RIGHT_BRACKET = ']';
-	private char RANGE = '-';
-	private char CONCATENATE = ' ';
-	private char ALTERNATE = '|';
-	private char KLEENE = '*';
-	private String EPSILON = "";
-	private char TAB = '\t';
-	private char ESCAPE_CHARACTER = '\\';
-
-	private HashSet<Character> alphabet;
 	private DFA recognizer;
-	private int id;
-
-	private static boolean debugMode;
 
 	public static void main(String[] args) {
 		try {
-			setDebugMode(args);
+			Constants.setDebugMode(args);
 			Lexer lexer = new Lexer(args[1]);
 			lexer.lex(args[0]);
 		}
@@ -39,20 +23,19 @@ public class Lexer {
 	public Lexer(String tokenTypeFileName)
 	throws FileNotFoundException, IOException {
 		String regularExpression = buildRegularExpression(tokenTypeFileName);
-		id = 0;
 		recognizer = buildRecognizer(regularExpression);
 	}
 
 	private String buildRegularExpression(String tokenTypeFileName)
 	throws FileNotFoundException, IOException {
 		String regularExpression = parseRegularExpression(tokenTypeFileName);
-		print("ORIGINAL: " + regularExpression);
+		Constants.print("ORIGINAL: " + regularExpression);
 
 		regularExpression = expandRanges(regularExpression);
-		print("EXPANDED: " + regularExpression);
+		Constants.print("EXPANDED: " + regularExpression);
 
 		regularExpression = convertToPostfix(regularExpression);
-		print("POSTFIX: " + regularExpression);
+		Constants.print("POSTFIX: " + regularExpression);
 
 		return regularExpression;
 	}
@@ -63,38 +46,63 @@ public class Lexer {
 			new FileReader(tokenTypeFileName)
 		);
 
-		String regularExpression = EPSILON;
+		String regularExpression = Constants.EPSILON;
 		String line;
 		while ((line = tokenTypeFile.readLine()) != null) {
-			String splitLine[] = line.split(TAB + "");
-			regularExpression += splitLine[0] + ALTERNATE;
+			String splitLine[] = line.split(Constants.TAB + "");
+			String expressionWithConcatenateSymbols
+			= insertConcatenateSymbols(splitLine[0]);
+			regularExpression
+			+= expressionWithConcatenateSymbols + Constants.ALTERNATE;
 		}
 		tokenTypeFile.close();
 		return regularExpression.substring(0, regularExpression.length() - 1);
 	}
 
+	private String insertConcatenateSymbols(String regularExpression) {
+		String expressionWithConcatenateSymbols = "";
+		char previousCharacter = regularExpression.charAt(0);
+		expressionWithConcatenateSymbols += previousCharacter;
+		for (int i = 1; i < regularExpression.length(); i++) {
+			char character = regularExpression.charAt(i);
+			if (isLetter(previousCharacter) && (isLetter(character))
+			|| (previousCharacter == Constants.KLEENE && isLetter(character))
+			|| (previousCharacter == Constants.KLEENE && isLeftBracket(character))
+			|| (isRightBracket(previousCharacter) && isLeftBracket(character))
+			|| (isLetter(previousCharacter) && isLeftBracket(character))
+			|| (isRightBracket(previousCharacter) && isLetter(character))) {
+				expressionWithConcatenateSymbols += Constants.CONCATENATE;
+			}
+			expressionWithConcatenateSymbols += character;
+			previousCharacter = character;
+		}
+		return expressionWithConcatenateSymbols;
+	}
+
+	private boolean isLetter(char character) {
+		return character != Constants.KLEENE
+		&& character != Constants.ALTERNATE
+		&& character != Constants.RANGE
+		&& !isLeftBracket(character)
+		&& !isRightBracket(character);
+	}
+
+	private boolean isLeftBracket(char character) {
+		return character == Constants.LEFT_PARENTHESIS
+		|| character == Constants.LEFT_BRACKET;
+	}
+
+	private boolean isRightBracket(char character) {
+		return character == Constants.RIGHT_PARENTHESIS
+		|| character == Constants.RIGHT_BRACKET;
+	}
+
 	private String expandRanges(String regularExpression) {
 		String expandedExpression = "";
 		for (int i = 0; i < regularExpression.length(); i++) {
-			if (i + 4 < regularExpression.length()
-			&& regularExpression.charAt(i) == LEFT_BRACKET
-			&& regularExpression.charAt(i + 2) == RANGE
-			&& regularExpression.charAt(i + 4) == RIGHT_BRACKET) {
-
-				int startCharacter = (int)regularExpression.charAt(i + 1);
-				int endCharacter = (int)regularExpression.charAt(i + 3);
-				String expandedRange = LEFT_PARENTHESIS + "";
-
-				for (int j = startCharacter; j < endCharacter; j++) {
-					expandedRange += (char)j + "" + ALTERNATE;
-				}
-				expandedRange += (char)endCharacter + "" + RIGHT_PARENTHESIS;
-
-				regularExpression = regularExpression.substring(0, i)
-				+ expandedRange + regularExpression.substring(
-					i + 4, regularExpression.length()
-				);
-				i += expandedRange.length();
+			if (isRange(regularExpression, i)) {
+				String expandedRange = expandRange(regularExpression, i);
+				i += 4;
 				expandedExpression += expandedRange;
 			}
 			else {
@@ -104,33 +112,53 @@ public class Lexer {
 		return expandedExpression;
 	}
 
+	private boolean isRange(String regularExpression, int i) {
+		return i + 4 < regularExpression.length()
+		&& regularExpression.charAt(i) == Constants.LEFT_BRACKET
+		&& regularExpression.charAt(i + 2) == Constants.RANGE
+		&& regularExpression.charAt(i + 4) == Constants.RIGHT_BRACKET;
+	}
+
+	private String expandRange(String regularExpression, int i) {
+		int startCharacter = (int)regularExpression.charAt(i + 1);
+		int endCharacter = (int)regularExpression.charAt(i + 3);
+		String expandedRange = Constants.LEFT_PARENTHESIS + "";
+
+		for (int j = startCharacter; j < endCharacter; j++) {
+			expandedRange += (char)j + "" + Constants.ALTERNATE;
+		}
+		expandedRange += (char)endCharacter + "" + Constants.RIGHT_PARENTHESIS;
+
+		regularExpression = regularExpression.substring(0, i)
+		+ expandedRange + regularExpression.substring(
+			i + 4, regularExpression.length()
+		);
+		return expandedRange;
+	}
+
 	private String convertToPostfix(String regularExpression) {
 		ArrayDeque<Operator> operatorStack = new ArrayDeque<Operator>();
-		Character previousCharacter = null;
-		String postfixExpression = EPSILON;
+		String postfixExpression = Constants.EPSILON;
 
 		for (int i = 0; i < regularExpression.length(); i++) {
 			Character character = regularExpression.charAt(i);
-			if (character == LEFT_PARENTHESIS) {
-				operatorStack.push(new Operator(character, previousCharacter));
+			if (character == Constants.LEFT_PARENTHESIS) {
+				operatorStack.push(new Operator(character));
 			}
-			else if (character == RIGHT_PARENTHESIS) {
+			else if (character == Constants.RIGHT_PARENTHESIS) {
 				while (operatorStack.peek().getCharacter()
-				!= LEFT_PARENTHESIS) {
+				!= Constants.LEFT_PARENTHESIS) {
 					postfixExpression += operatorStack.pop();
 				}
 				operatorStack.pop();
 			}
 			else {
-				Operator input = new Operator(character, previousCharacter);
+				Operator input = new Operator(character);
 				if (input.isOperator()) {
 					while (!operatorStack.isEmpty()
-					&& operatorStack.peek().getCharacter() != LEFT_PARENTHESIS
+					&& operatorStack.peek().getCharacter() != Constants.LEFT_PARENTHESIS
 					&& operatorStack.peek().hasGreaterOrEqualPrecedence(input)) {
 						postfixExpression += operatorStack.pop();
-					}
-					if (input.getCharacter() == CONCATENATE) {
-						postfixExpression += character;
 					}
 					operatorStack.push(input);
 				}
@@ -138,7 +166,6 @@ public class Lexer {
 					postfixExpression += character;
 				}
 			}
-			previousCharacter = character;
 		}
 		while (!operatorStack.isEmpty()) {
 			postfixExpression += operatorStack.pop();
@@ -147,162 +174,50 @@ public class Lexer {
 	}
 
 	private DFA buildRecognizer(String regularExpression) {
-		alphabet = new HashSet<Character>();
-		NFA nfa = buildNFA(regularExpression);
-		DFA dfa = convertToDFA(nfa);
-		// dfa = minimizeDFA();
+		NFA nfa = NFA.build(regularExpression);
+		// Constants.print(nfa.toString());
+		DFA dfa = DFA.build(nfa);
+		// Constants.print(dfa.toString());
+		// dfa = dfa.minimize();
+		// Constants.print(dfa.toString());
 		return dfa;
 	}
 
-	private NFA buildNFA(String postfixExpression) {
-		ArrayDeque<NFA> nfaStack = new ArrayDeque<NFA>();
-		Character character = null;
-		Character previousCharacter = null;
-		for (int i = 0; i < postfixExpression.length(); i++) {
-			character = postfixExpression.charAt(i);
-			Operator input = new Operator(character);
-			if (character == ESCAPE_CHARACTER) {
-				character = postfixExpression.charAt(++i);
-				nfaStack.push(generateCharacterNFA(character));
-			}
-			else if (input.isOperator()) {
-				nfaStack.push(
-					generateOperatorNFA(character, nfaStack)
-				);
-			}
-			else {
-				nfaStack.push(generateCharacterNFA(character));
-			}
-			previousCharacter = character;
-		}
-		nfaStack.peek().getLastState().makeAcceptingState();
-		return nfaStack.pop();
-	}
-
-	private NFA generateOperatorNFA(Character operator, ArrayDeque<NFA> nfaStack) {
-		if (operator == KLEENE) {
-			return kleene(nfaStack.pop());
-		}
-		else if (operator == CONCATENATE) {
-			return concatenate(nfaStack.pop(), nfaStack.pop());
-		}
-		else {
-			return alternate(nfaStack.pop(), nfaStack.pop());
-		}
-	}
-
-	private NFA concatenate(NFA b, NFA a) {
-		a.getLastState().addTransition(EPSILON, b.getFirstState());
-		return a;
-	}
-
-	private NFA kleene(NFA a) {
-		State firstState = new State(id++);
-		State lastState = new State(id++);
-
-		firstState.addTransition(EPSILON, a.getFirstState());
-		firstState.addTransition(EPSILON, lastState);
-		a.getLastState().addTransition(EPSILON, lastState);
-		a.getLastState().addTransition(EPSILON, a.getFirstState());
-
-		a.addFirstState(firstState);
-		a.addLastState(lastState);
-		return a;
-	}
-
-	private NFA alternate(NFA b, NFA a) {
-		State firstState = new State(id++);
-		State lastState = new State(id++);
-
-		firstState.addTransition(EPSILON, a.getFirstState());
-		firstState.addTransition(EPSILON, b.getFirstState());
-		a.getLastState().addTransition(EPSILON, lastState);
-		b.getLastState().addTransition(EPSILON, lastState);
-
-		a.addFirstState(firstState);
-		a.addLastState(lastState);
-		return a;
-	}
-
-	private NFA generateCharacterNFA(Character character) {
-		alphabet.add(character);
-
-		State firstState = new State(id++);
-		State lastState = new State(id++);
-
-		firstState.addTransition(character + "", lastState);
-
-		NFA nfa = new NFA(firstState, lastState);
-		return nfa;
-	}
-
-	private HashSet<State> closure(String character, HashSet<State> stateSet) {
-		HashSet<State> reachableStateSet = new HashSet<State>();
-		ArrayDeque<State> uncheckedStateStack = new ArrayDeque<State>();
-		uncheckedStateStack.addAll(stateSet);
-
-		while (!uncheckedStateStack.isEmpty()) { // starts as for each
-			State startState = uncheckedStateStack.pop();
-			State transitionState = startState.getTransition(character);
-			if (transitionState != null // if there is a transition
-			&& !reachableStateSet.contains(transitionState)) { // and the list of reachable states does not contain the state
-				reachableStateSet.add(transitionState); // add it
-				uncheckedStateStack.push(transitionState); // and add it to the list of states to check
-			}
-		}
-		return reachableStateSet;
-	}
-
-	private DFA convertToDFA(NFA nfa) {
-		DFA dfaTransitionTable = new DFA();
-
-		HashSet<State> dfaState = new HashSet<State>();
-		dfaState.add(nfa.getFirstState());
-		closure(EPSILON, dfaState);
-		ArrayDeque<HashSet<State>> uncheckedDFAStateStack
-		= new ArrayDeque<HashSet<State>>();
-		uncheckedDFAStateStack.push(dfaState);
-		HashSet<HashSet<State>> checkedDFAStateSet = new HashSet<HashSet<State>>();
-
-		while (!uncheckedDFAStateStack.isEmpty()) {
-			HashSet<State> uncheckedDFAState = uncheckedDFAStateStack.pop();
-			for (Character character : alphabet) {
-				dfaState = closure(character + "", uncheckedDFAState);
-				dfaState = closure(EPSILON, dfaState);
-
-				dfaTransitionTable.put(uncheckedDFAState, character + "", dfaState);
-				if (!checkedDFAStateSet.contains(dfaState)) {
-					uncheckedDFAStateStack.push(dfaState);
-				}
-				checkedDFAStateSet.add(uncheckedDFAState);
-			}
-		}
-		return dfaTransitionTable;
-	}
-
-	public ArrayList<String> lex(String sourceCodeFileName)
+	public ArrayList<Token> lex(String sourceCodeFileName)
 	throws FileNotFoundException, IOException {
-		BufferedReader bufferedReader = new BufferedReader(
-			new FileReader(sourceCodeFileName)
-		);
-		return new ArrayList<String>();
+		Token token = null;
+		ArrayList<Token> tokenList = new ArrayList<Token>();
+		CustomReader customReader = new CustomReader(sourceCodeFileName);
+		while ((token = getNextToken(customReader)) != null) {
+			Constants.print(token.toString());
+			tokenList.add(token);
+		}
+		return tokenList;
 	}
 
-	private static void setDebugMode(String[] args) {
-		debugMode = false;
-		if (args.length >= 3) {
-			for (String arg : args) {
-				if (arg.equals("-verbose")) {
-					debugMode = true;
-					break;
+	public Token getNextToken(CustomReader customReader) throws IOException {
+		String word = customReader.getNextWord();
+		if (word == null) {
+			return null;
+		}
+		DFAState dfaState = recognizer.getFirstState();
+		Token token = null;
+		for (int i = 0, lastValidIndex = 0; i < word.length(); i++) {
+			String character = word.charAt(i) + "";
+			DFAState previous = dfaState;
+			dfaState = dfaState.getTransition(character);
+			if (dfaState == null) {
+				if (token == null) {
+					throw new IllegalArgumentException();
 				}
+				customReader.rollback(word.substring(lastValidIndex));
+				return token;
+			}
+			if (dfaState.isAcceptingDFAState()) {
+				token = new Token(word.substring(0, i + 1), "placeholder");
+				lastValidIndex = i + 1;
 			}
 		}
-	}
-
-	private void print(String string) {
-		if (debugMode) {
-			System.out.println("\t====>\n" + string + "\n<====\n");
-		}
+		return token;
 	}
 }
