@@ -1,0 +1,7 @@
+Goal -> Expressions
+Expressions -> Expressions Expression
+Expression -> Definition | Evaluation
+Definition -> Initialization VariableName Evaluation | ConstantName OpenAction Expressions CloseAction
+Evaluation -> Name Arguments | Operator Arguments
+VariableName -> identifierLower
+ConstantName -> identifierUpper
