@@ -1,4 +1,0 @@
-a	IdentifierLower
-aaaaaaa	IdentifierLower
-abababababab	IdentifierLower
-aaabababababbbab	IdentifierLower
