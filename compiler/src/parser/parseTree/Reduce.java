@@ -1,4 +1,4 @@
-package parser;
+package parser.parseTree;
 
 public class Reduce extends Action {
 	private NonTerminal reduction;

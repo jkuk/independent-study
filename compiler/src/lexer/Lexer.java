@@ -242,6 +242,7 @@ public class Lexer {
 	}
 
 	public Token createToken(String lexeme) {
+		// build a look up table for type
 		String type;
 		if (lexeme.equals("'")) {
 			type = "Literal";

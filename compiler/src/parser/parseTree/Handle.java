@@ -1,4 +1,4 @@
-package parser;
+package parser.parseTree;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +12,10 @@ public class Handle {
 		for (String symbolString : symbolStringArray) {
 			String symbol = symbolString.trim();
 			if (Character.isUpperCase(symbol.charAt(0))) {
-				symbolList.add(new NonTerminal(symbol));
+				symbolList.add(new Terminal(symbol));
 			}
 			else {
-				symbolList.add(new Terminal(symbol));
+				symbolList.add(new NonTerminal(symbol));
 			}
 		}
 	}

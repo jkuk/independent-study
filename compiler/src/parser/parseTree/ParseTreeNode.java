@@ -1,4 +1,4 @@
-package parser;
+package parser.parseTree;
 import lexer.Token;
 
 import java.util.ArrayDeque;
@@ -20,7 +20,7 @@ public class ParseTreeNode {
 	public ParseTreeNode(Symbol symbol) {
 		this(symbol, new ArrayDeque<ParseTreeNode>());
 	}
-	
+
 	public ParseTreeNode(
 		Symbol symbol, Deque<ParseTreeNode> parseTreeNodeStack
 	) {
@@ -30,9 +30,13 @@ public class ParseTreeNode {
 			children.add(parseTreeNodeStack.poll());
 		}
 	}
-	
+
 	public Symbol getSymbol() {
 		return symbol;
+	}
+
+	public String getLexeme() {
+		return lexeme;
 	}
 
 	public List<ParseTreeNode> getChildren() {

@@ -1,4 +1,4 @@
-package parser;
+package parser.parseTree;
 
 import java.util.Deque;
 import java.util.ArrayDeque;
