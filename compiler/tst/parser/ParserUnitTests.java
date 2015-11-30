@@ -1,6 +1,10 @@
 package parser;
 import lexer.Token;
-import parser.Symbol;
+import parser.abstractSyntaxTree.AbstractSyntaxTree;
+import parser.parseTree.NonTerminal;
+import parser.parseTree.ParseTree;
+import parser.parseTree.ParseTreeNode;
+import parser.parseTree.Symbol;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -13,102 +17,212 @@ public class ParserUnitTests {
 	private static int testNumber = 0;
 	public static void main(String[] args) {
 		// printResult(ParserSimpleInvalidTest());
-		// printResult(ParserSimpleValidTest());
+		printResult(ParserSimpleValidTest());
 		// printResult(ParserComplexInvalidTest());
-		printResult(ParserComplexValidTest());
+		// printResult(ParserComplexValidTest());
 		// printResult(ParserActualInvalidTest());
 		// printResult(ParserActualValidTest());
+		test();
 	}
 
-	public static boolean ParserSimpleInvalidTest() {
-		try {
-			Deque<Token> tokenQueue = new ArrayDeque<Token>();
-			Token token = new Token("Asdf", "identifierUpper");
-			tokenQueue.offer(token);
-			Parser parser = new Parser("./input/parser/SimpleGrammar.txt");
-			ParseTree parseTree = parser.parse(tokenQueue);
+	public static void test() {
+		AbstractSyntaxTree tree;
+		Token token;
+		Deque<Token> tokenQueue = new ArrayDeque<Token>();
+		Parser parser = new Parser("./input/parser/ComplexGrammar.txt");
 
-			return parseTree == null;
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
+		token = new Token("1", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("2", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("3", "Identifier");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+
+		token = new Token("op1", "Operator");
+		tokenQueue.offer(token);
+		token = new Token("2", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("3", "Identifier");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+
+		token = new Token("if1", "IfSymbol");
+		tokenQueue.offer(token);
+		token = new Token("2", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("exp3", "Expressions");
+		tokenQueue.offer(token);
+		token = new Token("return4", "ReturnExpression");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+
+		token = new Token("while1", "WhileSymbol");
+		tokenQueue.offer(token);
+		token = new Token("2", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("exp3", "Expressions");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+
+		token = new Token("1", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("int2", "DataType");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+
+		token = new Token("arr1", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token(".2", "ArraySymbol");
+		tokenQueue.offer(token);
+		token = new Token("int3", "DataType");
+		tokenQueue.offer(token);
+		token = new Token("4", "Evaluation");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+
+		token = new Token("fun1", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("int2", "DataType");
+		tokenQueue.offer(token);
+		token = new Token("par3", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("int3.1", "DataType");
+		tokenQueue.offer(token);
+		token = new Token("exp4", "Expressions");
+		tokenQueue.offer(token);
+		token = new Token("ret5", "ReturnExpression");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+
+		token = new Token("id1", "Identifier");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+
+		// case ParserConstants.EMPTY:
+		//
+		// case ParserConstants.NULL:
+		//
+		// case ParserConstants.VARIABLE:
+		//
+		// case ParserConstants.ARRAY:
+		//
+		// case ParserConstants.FUNCTION:
+		//
+		// case ParserConstants.IDENTIFIER:
+		//
+		// default: return null;
 	}
 
+	//
+	// public static boolean ParserSimpleInvalidTest() {
+	// 	try {
+	// 		Deque<Token> tokenQueue = new ArrayDeque<Token>();
+	// 		Token token = new Token("Asdf", "identifierUpper");
+	// 		tokenQueue.offer(token);
+	// 		Parser parser = new Parser("./input/parser/SimpleGrammar.txt");
+	// 		ParseTree parseTree = parser.parse(tokenQueue);
+	//
+	// 		return parseTree == null;
+	// 	}
+	// 	catch (Exception e) {
+	// 		e.printStackTrace();
+	// 	}
+	// 	return false;
+	// }
+	//
 	public static boolean ParserSimpleValidTest() {
 		try {
 			Deque<Token> tokenQueue = new ArrayDeque<Token>();
-			Token token = new Token("asdF", "identifierLower");
+			Token token = new Token("asdF", "IdentifierLower");
+			tokenQueue.offer(token);
+			token = new Token("String", "DataType");
 			tokenQueue.offer(token);
 			Parser parser = new Parser("./input/parser/SimpleGrammar.txt");
-			ParseTree parseTree = parser.parse(tokenQueue);
+			AbstractSyntaxTree parseTree = parser.parse(tokenQueue);
 
-			ParseTreeNode expectedNode
-			= new ParseTreeNode(new Token("asdF", "identifierLower"));
-			Deque<ParseTreeNode> expectedQueue
-			= new ArrayDeque<ParseTreeNode>();
-			expectedQueue.offer(expectedNode);
-			ParseTree expectedTree = new ParseTree(
-				new ParseTreeNode(ParserConstants.GOAL, expectedQueue)
-			);
+			// ParseTreeNode expectedNode
+			// = new ParseTreeNode(new Token("asdF", "IdentifierLower"));
+			// Deque<ParseTreeNode> expectedQueue
+			// = new ArrayDeque<ParseTreeNode>();
+			// expectedQueue.offer(expectedNode);
+			// ParseTree expectedTree = new ParseTree(
+			// 	new ParseTreeNode(ParserConstants.GOAL, expectedQueue)
+			// );
 
 			System.out.println(parseTree);
-			System.out.println(expectedTree);
-			return parseTree.equals(expectedTree);
+			// System.out.println(expectedTree);
+			// return parseTree.equals(expectedTree);
+			return true;
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
-	// 
+	//
 	// public static boolean ParserComplexInvalidTest() {
 	// 	try {
 	// 		Deque<Token> tokenQueue = new ArrayDeque<Token>();
 	// 		Token token = new Token("asdf", "identifierLower");
 	// 		tokenQueue.offer(token);
-	// 
+	//
 	// 		token = new Token("AsdF", "identifierUpper");
 	// 		tokenQueue.offer(token);
-	// 
+	//
 	// 		token = new Token("aSdF", "identifierLower");
 	// 		tokenQueue.offer(token);
-	// 
+	//
 	// 		token = new Token("aSDFASDF", "identifierLower");
 	// 		tokenQueue.offer(token);
-	// 
+	//
 	// 		Parser parser = new Parser("./input/parser/ComplexGrammar.txt");
 	// 		ParseTree parseTree = parser.parse(tokenQueue);
 	// 		ParseTreeNode actualNode = parseTree.getRoot();
-	// 
+	//
 	// 		Deque<ParseTreeNode> expectedQueue
 	// 		= new ArrayDeque<ParseTreeNode>();
-	// 
+	//
 	// 		ParseTreeNode expectedNode = new ParseTreeNode(
 	// 			new Terminal("aSDFASDF", "identifierLower")
 	// 		);
 	// 		expectedQueue.offer(expectedNode);
-	// 
+	//
 	// 		expectedNode = new ParseTreeNode(
 	// 			new Terminal("aSdF", "identifierLower"), expectedQueue
 	// 		);
 	// 		expectedQueue.offer(expectedNode);
-	// 
+	//
 	// 		expectedNode = new ParseTreeNode(
 	// 			new Terminal("AsdF", "identifierUpper"), expectedQueue
 	// 		);
 	// 		expectedQueue.offer(expectedNode);
-	// 
+	//
 	// 		expectedNode = new ParseTreeNode(
 	// 			new Terminal("asdf", "identifierLower"), expectedQueue
 	// 		);
 	// 		expectedQueue.offer(expectedNode);
-	// 
+	//
 	// 		expectedNode = new ParseTreeNode(
 	// 			new NonTerminal("Goal"), expectedQueue
 	// 		);
-	// 
+	//
 	// 		return actualNode.equals(expectedNode);
 	// 	}
 	// 	catch (Exception e) {
@@ -116,109 +230,58 @@ public class ParserUnitTests {
 	// 	}
 	// 	return false;
 	// }
-	// 
-	public static boolean ParserComplexValidTest() {
-		try {
-			Deque<Token> tokenQueue = new ArrayDeque<Token>();
-			Token token = new Token("asdf", "identifierLower");
-			tokenQueue.offer(token);
-
-			token = new Token("AsdF", "identifierUpper");
-			tokenQueue.offer(token);
-
-			token = new Token("aSdF", "identifierLower");
-			tokenQueue.offer(token);
-
-			token = new Token("aSDFASDF", "identifierLower");
-			tokenQueue.offer(token);
-
-			Parser parser = new Parser("./input/parser/ComplexGrammar.txt");
-			ParseTree parseTree = parser.parse(tokenQueue);
-
-			ParseTreeNode expectedNode
-			= new ParseTreeNode(new NonTerminal("Identifiers"));
-
-			ParseTreeNode parentNode = expectedNode;
-			ParseTreeNode childNode
-			= new ParseTreeNode(new Token("aSDFASDF", "identifierLower"));
-			parentNode.getChildren().add(childNode);
-			childNode = new ParseTreeNode(new NonTerminal("Identifiers"));
-			parentNode.getChildren().add(childNode);
-			
-			parentNode = childNode;
-			childNode
-			= new ParseTreeNode(new Token("aSdF", "identifierLower"));
-			parentNode.getChildren().add(childNode);
-			childNode = new ParseTreeNode(new NonTerminal("Identifiers"));
-			parentNode.getChildren().add(childNode);
-
-			parentNode = childNode;
-			childNode
-			= new ParseTreeNode(new Token("AsdF", "identifierUpper"));
-			parentNode.getChildren().add(childNode);
-			childNode = new ParseTreeNode(new NonTerminal("Identifiers"));
-			parentNode.getChildren().add(childNode);
-
-			parentNode = childNode;
-			childNode
-			= new ParseTreeNode(new Token("asdf", "identifierLower"));
-			parentNode.getChildren().add(childNode);
-
-			ParseTree expectedTree = new ParseTree(expectedNode);
-			System.out.println(parseTree);
-			System.out.println(expectedTree);
-
-			return parseTree.equals(expectedTree);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
-	
+	//
 	// public static boolean ParserComplexValidTest() {
 	// 	try {
 	// 		Deque<Token> tokenQueue = new ArrayDeque<Token>();
 	// 		Token token = new Token("asdf", "identifierLower");
 	// 		tokenQueue.offer(token);
-	// 
+	//
 	// 		token = new Token("AsdF", "identifierUpper");
 	// 		tokenQueue.offer(token);
-	// 
+	//
 	// 		token = new Token("aSdF", "identifierLower");
 	// 		tokenQueue.offer(token);
-	// 
+	//
 	// 		token = new Token("aSDFASDF", "identifierLower");
 	// 		tokenQueue.offer(token);
-	// 
+	//
 	// 		Parser parser = new Parser("./input/parser/ComplexGrammar.txt");
 	// 		ParseTree parseTree = parser.parse(tokenQueue);
-	// 
+	//
 	// 		ParseTreeNode expectedNode
-	// 		= new ParseTreeNode(new NonTerminal("Goal"));
-	// 
+	// 		= new ParseTreeNode(new NonTerminal("Identifiers"));
+	//
 	// 		ParseTreeNode parentNode = expectedNode;
 	// 		ParseTreeNode childNode
-	// 		= new ParseTreeNode(new Token("asdf", "identifierLower"));
+	// 		= new ParseTreeNode(new Token("aSDFASDF", "identifierLower"));
 	// 		parentNode.getChildren().add(childNode);
-	// 
-	// 		parentNode = childNode;
-	// 		childNode
-	// 		= new ParseTreeNode(new Token("AsdF", "identifierUpper"));
+	// 		childNode = new ParseTreeNode(new NonTerminal("Identifiers"));
 	// 		parentNode.getChildren().add(childNode);
-	// 
+	//
 	// 		parentNode = childNode;
 	// 		childNode
 	// 		= new ParseTreeNode(new Token("aSdF", "identifierLower"));
 	// 		parentNode.getChildren().add(childNode);
-	// 
+	// 		childNode = new ParseTreeNode(new NonTerminal("Identifiers"));
+	// 		parentNode.getChildren().add(childNode);
+	//
 	// 		parentNode = childNode;
 	// 		childNode
-	// 		= new ParseTreeNode(new Token("aSDFASDF", "identifierLower"));
+	// 		= new ParseTreeNode(new Token("AsdF", "identifierUpper"));
 	// 		parentNode.getChildren().add(childNode);
-	// 
+	// 		childNode = new ParseTreeNode(new NonTerminal("Identifiers"));
+	// 		parentNode.getChildren().add(childNode);
+	//
+	// 		parentNode = childNode;
+	// 		childNode
+	// 		= new ParseTreeNode(new Token("asdf", "identifierLower"));
+	// 		parentNode.getChildren().add(childNode);
+	//
 	// 		ParseTree expectedTree = new ParseTree(expectedNode);
-	// 
+	// 		System.out.println(parseTree);
+	// 		System.out.println(expectedTree);
+	//
 	// 		return parseTree.equals(expectedTree);
 	// 	}
 	// 	catch (Exception e) {
@@ -226,11 +289,62 @@ public class ParserUnitTests {
 	// 	}
 	// 	return false;
 	// }
-	// 
+
+	// public static boolean ParserComplexValidTest() {
+	// 	try {
+	// 		Deque<Token> tokenQueue = new ArrayDeque<Token>();
+	// 		Token token = new Token("asdf", "identifierLower");
+	// 		tokenQueue.offer(token);
+	//
+	// 		token = new Token("AsdF", "identifierUpper");
+	// 		tokenQueue.offer(token);
+	//
+	// 		token = new Token("aSdF", "identifierLower");
+	// 		tokenQueue.offer(token);
+	//
+	// 		token = new Token("aSDFASDF", "identifierLower");
+	// 		tokenQueue.offer(token);
+	//
+	// 		Parser parser = new Parser("./input/parser/ComplexGrammar.txt");
+	// 		ParseTree parseTree = parser.parse(tokenQueue);
+	//
+	// 		ParseTreeNode expectedNode
+	// 		= new ParseTreeNode(new NonTerminal("Goal"));
+	//
+	// 		ParseTreeNode parentNode = expectedNode;
+	// 		ParseTreeNode childNode
+	// 		= new ParseTreeNode(new Token("asdf", "identifierLower"));
+	// 		parentNode.getChildren().add(childNode);
+	//
+	// 		parentNode = childNode;
+	// 		childNode
+	// 		= new ParseTreeNode(new Token("AsdF", "identifierUpper"));
+	// 		parentNode.getChildren().add(childNode);
+	//
+	// 		parentNode = childNode;
+	// 		childNode
+	// 		= new ParseTreeNode(new Token("aSdF", "identifierLower"));
+	// 		parentNode.getChildren().add(childNode);
+	//
+	// 		parentNode = childNode;
+	// 		childNode
+	// 		= new ParseTreeNode(new Token("aSDFASDF", "identifierLower"));
+	// 		parentNode.getChildren().add(childNode);
+	//
+	// 		ParseTree expectedTree = new ParseTree(expectedNode);
+	//
+	// 		return parseTree.equals(expectedTree);
+	// 	}
+	// 	catch (Exception e) {
+	// 		e.printStackTrace();
+	// 	}
+	// 	return false;
+	// }
+	//
 	// public static boolean ParserActualInvalidTest() {
 	// 	return false;
 	// }
-	// 
+	//
 	// public static boolean ParserActualValidTest() {
 	// 	return false;
 	// }

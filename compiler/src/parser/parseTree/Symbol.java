@@ -1,4 +1,4 @@
-package parser;
+package parser.parseTree;
 
 public abstract class Symbol {
 	private String type;

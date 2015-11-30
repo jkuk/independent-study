@@ -1,4 +1,4 @@
-package parser;
+package parser.parseTree;
 
 public class Shift extends Action {
 	private ParserState destinationState;

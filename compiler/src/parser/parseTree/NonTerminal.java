@@ -1,7 +1,7 @@
-package parser;
+package parser.parseTree;
 
-public class Terminal extends Symbol {
-	public Terminal(String type) {
+public class NonTerminal extends Symbol {
+	public NonTerminal(String type) {
 		super(type);
 	}
 

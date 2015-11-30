@@ -1,1 +1,2 @@
-Goal -> identifierLower
+goal -> IdentifierLower DataType
+: variable 0 1
