@@ -1,7 +1,7 @@
 goal -> list | evaluation | conditional | loop | variable | array | function | identifier
 : null | null | null | null | null | null | null | null
 
-list -> list Identifier | Identifier
+list -> list Identifier | Epsilon
 : list 0 1 | null
 
 evaluation -> Operator Identifier Identifier

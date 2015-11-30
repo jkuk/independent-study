@@ -1,2 +1,4 @@
-goal -> IdentifierLower DataType
-: variable 0 1
+goal -> list
+: null
+list -> list Identifier | Epsilon
+: list 0 1 | null

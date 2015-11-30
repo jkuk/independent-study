@@ -167,10 +167,25 @@ public class Parser {
 				nextSymbolSet.add(item.getLookAheadSymbol());
 			}
 			else {
-				nextSymbolSet.add(item.getNextSymbol());
+				Symbol nextSymbol = item.getNextSymbol();
+				// java.util.List<Symbol> suffix = item.getSuffix();
+				// int i = 0;
+				// while (nextSymbol.equals(ParserConstants.EPSILON)
+				// && i < suffix.size()) {
+				// 	nextSymbol = suffix.get(i++);
+				// }
+				// if (i == suffix.size()) {
+				// 	nextSymbol = item.getLookAheadSymbol();
+				// }
+				System.out.println("SHOULD NOT BE EPSILON:  " + nextSymbol);
+				nextSymbolSet.add(nextSymbol);
+				// nextSymbolSet.add(item.getNextSymbol());
 			}
 		}
 		System.out.println("\t\t\t\tFinishing buildNextSymbolSet: ");
+		System.out.println("PARSER STATE: " + parserState);
+		System.out.println("ITEM SET:  " + parserState.getItemSet());
+		System.out.println("NEXT SYMBOL SET: " + nextSymbolSet);
 		return nextSymbolSet;
 	}
 
@@ -190,6 +205,8 @@ public class Parser {
 				parserState, new HashMap<Symbol, ParserState>()
 			);
 		}
+		System.out.println("SYMBOL SHOULD BE SOMETHING:  " + symbol);
+		System.out.println("DeSTINATION:  " + destinationState);
 		parserStateTransitionMap.get(parserState).put(symbol, destinationState);
 		System.out.println("\t\t\t\t\tFinishing addParserStateToCanonicalCollection: ");
 	}
@@ -211,7 +228,7 @@ public class Parser {
 		}
 
 		Symbol nextSymbol = item.getNextSymbol();
-		if (nextSymbol == null) {
+		if (nextSymbol == null /*|| nextSymbol.equals(ParserConstants.EPSILON)*/) {
 			Symbol lookAheadSymbol = item.getLookAheadSymbol();
 			if (item.getReduction().equals(ParserConstants.GOAL)) {
 				if (lookAheadSymbol.equals(ParserConstants.EOF)) {
@@ -232,6 +249,10 @@ public class Parser {
 			ParserState destinationState
 			= parserStateTransitionMap.get(parserState).get(nextSymbol);
 			if (destinationState != null) {
+				if (nextSymbol.equals(ParserConstants.EPSILON)) {
+					nextSymbol = item.getLookAheadSymbol();
+				}
+
 				symbolActionMap.put(nextSymbol, new Shift(destinationState));
 			}
 		}
@@ -252,7 +273,7 @@ public class Parser {
 			parserState = parserStateStack.peek();
 			action
 			= actionTable.get(parserState).get(lookAheadNode.getSymbol());
-			System.out.println();
+			System.out.println("\nACTION STUFF");
 			System.out.println(parserState);
 			System.out.println(actionTable.get(parserState));
 			System.out.println(lookAheadNode.getSymbol());
@@ -268,6 +289,7 @@ public class Parser {
 		Reduce reduceAction = (Reduce)action;
 		reduce(reduceAction.getReduction(), reduceAction.getHandle());
 		System.out.println("Parse Tree: " + new ParseTree(parseTreeNodeStack.pop()));
+		System.out.println("SIZE: " + abstractSyntaxTreeNodeListStack.size());
 		return new AbstractSyntaxTree(abstractSyntaxTreeNodeListStack.pop());
 		// return new ParseTree(parseTreeNodeStack.pop());
 	}
@@ -353,12 +375,12 @@ public class Parser {
 		String type = splitInstruction[0];
 		switch (type) {
 			case ParserConstants.LIST:
+			if (nodeIndexArray.length == 0) {
+				return new LinkedList<Node>();
+			}
 			LinkedList<Node> listBranch = nodeArray[nodeIndexArray[0]];
 			LinkedList<Node> nodeBranch = nodeArray[nodeIndexArray[1]];
 			return Node.extendListWithNode(listBranch, nodeBranch);
-
-			case ParserConstants.EMPTY:
-			return new LinkedList<Node>();
 
 			case ParserConstants.NULL:
 			return null;

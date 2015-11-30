@@ -1,4 +1,5 @@
 package parser.parseTree;
+import parser.ParserConstants;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -58,7 +59,19 @@ public class Item {
 	}
 
 	public Symbol getNextSymbol() {
-		return nextSymbol;
+		Symbol symbol = nextSymbol;
+		// int i = 0;
+		// while (symbol.equals(ParserConstants.EPSILON)
+		// && i < suffix.size()) {
+		// 	System.out.println("ASDASDASD");
+		//
+		// 	symbol = suffix.get(i++);
+		// }
+		// if (i == suffix.size() && symbol.equals(ParserConstants.EPSILON)) {
+		// 	symbol = lookAheadSymbol;
+		// }
+		return symbol;
+		// return nextSymbol;
 	}
 
 	public List<Symbol> getSuffix() {
