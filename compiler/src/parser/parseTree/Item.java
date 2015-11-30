@@ -59,19 +59,7 @@ public class Item {
 	}
 
 	public Symbol getNextSymbol() {
-		Symbol symbol = nextSymbol;
-		// int i = 0;
-		// while (symbol.equals(ParserConstants.EPSILON)
-		// && i < suffix.size()) {
-		// 	System.out.println("ASDASDASD");
-		//
-		// 	symbol = suffix.get(i++);
-		// }
-		// if (i == suffix.size() && symbol.equals(ParserConstants.EPSILON)) {
-		// 	symbol = lookAheadSymbol;
-		// }
-		return symbol;
-		// return nextSymbol;
+		return nextSymbol;
 	}
 
 	public List<Symbol> getSuffix() {

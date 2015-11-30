@@ -19,7 +19,6 @@ public class AbstractSyntaxTree {
 
 	private void initializeDepthForEachNode() {
 		Deque<Node> nodeStack = new ArrayDeque<Node>();
-
 		for (Node root : rootBranch) {
 			nodeStack.push(root);
 		}
@@ -73,15 +72,14 @@ public class AbstractSyntaxTree {
 	public SymbolTable getSymbolTable() {
 		return symbolTable;
 	}
+
 	public String toString() {
 		Deque<Node> nodeStack = new ArrayDeque<Node>();
-
 		for (Node root : rootBranch) {
 			nodeStack.push(root);
 		}
-		String string = "AST:\n";
+		String string = "";
 		while (!nodeStack.isEmpty()) {
-			System.out.println("tick");
 			Node node = nodeStack.pop();
 			for (Node child : node.getChildren()) {
 				nodeStack.push(child);

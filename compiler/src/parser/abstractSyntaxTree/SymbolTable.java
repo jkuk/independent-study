@@ -11,7 +11,6 @@ public class SymbolTable {
 	}
 
 	public String addSymbol(Node node, LinkedList<String> scopeNameList) {
-		System.out.println(node.getAnnotation());
 		Scope scope = getScope(scopeNameList);
 		if (scope.contains(node.getLexeme())) {
 			if (node.getAnnotation() != ParserConstants.NONE) {
@@ -21,7 +20,6 @@ public class SymbolTable {
 		else {
 			switch (node.getAnnotation()) {
 				case ParserConstants.NEW_VARIABLE:
-				System.out.println("Add symbol: " + node);
 				scope.addVariable(node);
 				break;
 
@@ -32,12 +30,6 @@ public class SymbolTable {
 				case ParserConstants.NEW_FUNCTION:
 				scope.addFunction(node);
 				return node.getLexeme();
-
-				// case ParserConstants.NONE:
-				// // might have to remove this
-				// break;
-
-				// potentially need another annotation for old variable
 
 				default:
 				throw new IllegalArgumentException();

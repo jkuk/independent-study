@@ -7,10 +7,6 @@ public class Variable {
 
 	public Variable(Node node) {
 		name = node.getLexeme();
-		// System.out.println(node);
-		// System.out.println(node.get(ParserConstants.DATA_TYPE_BRANCH));
-		// System.out.println(node.get(ParserConstants.DATA_TYPE_BRANCH)
-		// .get(ParserConstants.DATA_TYPE_INDEX));
 		dataType = node.getBranch(ParserConstants.DATA_TYPE_BRANCH)
 		.get(ParserConstants.DATA_TYPE_INDEX).getLexeme();
 	}

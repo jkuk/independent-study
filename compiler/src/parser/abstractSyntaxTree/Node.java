@@ -13,10 +13,6 @@ public class Node {
 	public static LinkedList<Node> buildSingleton(
 		Node symbolNode, LinkedList<Node>... branchArray
 	) {
-		// LinkedList<Node> nodeList = new LinkedList<Node>();
-		// Node node = new Node(symbolNode, branchArray);
-		// nodeList.add(node);
-		// return nodeList;
 		return buildSingleton(symbolNode, symbolNode.getAnnotation(), branchArray);
 	}
 
@@ -32,12 +28,7 @@ public class Node {
 
 	protected Node(Node symbolNode, LinkedList<Node>... branchArray) {
 		this(symbolNode);
-		// this.branchArray = new LinkedList<Node>[branchArray.length];
-		// for (int i = 0; i < branchArray.length; i++) {
-		// 	this.branchArray[i] = branchArray[i];
-		// }
 		this.branchArray = branchArray;
-		System.out.println("branch array: " + java.util.Arrays.toString(branchArray));
 	}
 
 	protected Node(Node node) {
@@ -103,13 +94,10 @@ public class Node {
 	}
 
 	public LinkedList<Node> getChildren() {
-		System.out.println("getting children for: " + lexeme);
 		LinkedList<Node> children = new LinkedList<Node>();
 		for (LinkedList<Node> branch : branchArray) {
-			System.out.println("branch: " + branch);
 			children.addAll(branch);
 		}
-		System.out.println("children: " + children);
 		return children;
 	}
 

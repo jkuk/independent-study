@@ -14,7 +14,6 @@ public class Function extends Variable {
 		parameterTypeList = new LinkedList<String>();
 		for (Node parameterNode
 		: node.getBranch(ParserConstants.PARAMETERS_BRANCH)) {
-			System.out.println("looking at parameterNode:  " + parameterNode);
 			parameterTypeList.add(
 				parameterNode.get(ParserConstants.DATA_TYPE_INDEX)
 				.getLexeme()

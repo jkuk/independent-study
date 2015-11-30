@@ -54,6 +54,6 @@ public class Scope {
 	}
 
 	public String toString() {
-		return name + ":\n" + variableMap + "\n" + arrayMap + "\n" + functionMap;
+		return name + ":\n\t" + variableMap + "\n\t" + arrayMap + "\n\t" + functionMap;
 	}
 }

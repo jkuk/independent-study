@@ -3,6 +3,7 @@ import parser.abstractSyntaxTree.*;
 import parser.parseTree.*;
 import parser.ParserConstants;
 import lexer.Token;
+import compiler.Helper;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -16,10 +17,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import java.util.Deque;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import java.util.Arrays;
 
 public class Parser {
 	private Map<NonTerminal, ArrayList<Handle>> productionMap;
@@ -40,27 +40,28 @@ public class Parser {
 
 	public Parser(String grammarFileName) {
 		try {
+			Helper.setDebugMode(true);
+			Helper.resetDepth();
 			initializeProductionMapAndAbstractSyntaxTreeReductionTable(
 				grammarFileName
 			);
-			System.out.println("Production map: " + productionMap);
-			System.out.println(
+			Helper.print("Production map: " + productionMap);
+			Helper.print(
 				"Abstract syntax tree node reduction table: "
 				+ abstractSyntaxTreeReductionTable
 			);
 
 			initializeInitialState();
-			System.out.println("Initial State: " + initialState);
+			Helper.print("Initial State: " + initialState);
 
 			initializeCanonicalCollection();
-			System.out.println("Canonical Collection: " + canonicalCollection);
-			System.out.println(
-				"Parser State Transition Map: "
-				+ parserStateTransitionMap
+			Helper.print("Canonical Collection: " + canonicalCollection);
+			Helper.print(
+				"Parser State Transition Map: " + parserStateTransitionMap
 			);
 
 			initializeActionTable();
-			System.out.println("Action table: " + actionTable);
+			Helper.print("Action table: " + actionTable);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -71,7 +72,9 @@ public class Parser {
 		String grammarFileName
 	)
 	throws FileNotFoundException, IOException {
-		System.out.println("Starting initializeProductionMap: ");
+		Helper.printEntering(
+			"initializeProductionMapAndAbstractSyntaxTreeReductionTable"
+		);
 		BufferedReader grammarFile = new BufferedReader(
 			new FileReader(grammarFileName)
 		);
@@ -108,21 +111,23 @@ public class Parser {
 				}
 			}
 		}
-		System.out.println("Finishing initializeProductionMap: ");
+		Helper.printExiting(
+			"initializeProductionMapAndAbstractSyntaxTreeReductionTable"
+		);
 	}
 
 	private void initializeInitialState() {
-		System.out.println("\tStarting initializeInitialState: ");
+		Helper.printEntering("initializeInitialState");
 		initialState = new ParserState(
 			ParserConstants.GOAL,
 			productionMap.get(ParserConstants.GOAL),
 			ParserConstants.EOF
 		).buildClosure(productionMap);
-		System.out.println("\tFinishing initializeInitialState: ");
+		Helper.printExiting("initializeInitialState");
 	}
 
 	private void initializeCanonicalCollection() {
-		System.out.println("\t\tStarting initializeCanonicalCollection: ");
+		Helper.printEntering("initializeCanonicalCollection");
 		canonicalCollection = new HashSet<ParserState>();
 		canonicalCollection.add(initialState);
 
@@ -134,13 +139,13 @@ public class Parser {
 		= new HashMap<ParserState, HashMap<Symbol, ParserState>>();
 
 		initializeCanonicalCollection(unmarkedParserStateStack);
-		System.out.println("\t\tFinishing initializeCanonicalCollection: ");
+		Helper.printExiting("initializeCanonicalCollection");
 	}
 
 	private void initializeCanonicalCollection(
 		Deque<ParserState> unmarkedParserStateStack
 	) {
-		System.out.println("\t\t\tStarting initializeCanonicalCollection: ");
+		Helper.printEntering("initializeCanonicalCollection");
 		int previousSize = 0;
 		while (canonicalCollection.size() != previousSize) {
 			previousSize = canonicalCollection.size();
@@ -156,36 +161,21 @@ public class Parser {
 				}
 			}
 		}
-		System.out.println("\t\t\tFinishing initializeCanonicalCollection: ");
+		Helper.printExiting("initializeCanonicalCollection");
 	}
 
 	private Set<Symbol> buildNextSymbolSet(ParserState parserState) {
-		System.out.println("\t\t\t\tStarting buildNextSymbolSet: ");
+		Helper.printEntering("buildNextSymbolSet");
 		Set<Symbol> nextSymbolSet = new HashSet<Symbol>();
 		for (Item item : parserState.getItemSet()) {
 			if (item.getNextSymbol() == null) {
 				nextSymbolSet.add(item.getLookAheadSymbol());
 			}
 			else {
-				Symbol nextSymbol = item.getNextSymbol();
-				// java.util.List<Symbol> suffix = item.getSuffix();
-				// int i = 0;
-				// while (nextSymbol.equals(ParserConstants.EPSILON)
-				// && i < suffix.size()) {
-				// 	nextSymbol = suffix.get(i++);
-				// }
-				// if (i == suffix.size()) {
-				// 	nextSymbol = item.getLookAheadSymbol();
-				// }
-				System.out.println("SHOULD NOT BE EPSILON:  " + nextSymbol);
-				nextSymbolSet.add(nextSymbol);
-				// nextSymbolSet.add(item.getNextSymbol());
+				nextSymbolSet.add(item.getNextSymbol());
 			}
 		}
-		System.out.println("\t\t\t\tFinishing buildNextSymbolSet: ");
-		System.out.println("PARSER STATE: " + parserState);
-		System.out.println("ITEM SET:  " + parserState.getItemSet());
-		System.out.println("NEXT SYMBOL SET: " + nextSymbolSet);
+		Helper.printExiting("buildnextSymbolSet");
 		return nextSymbolSet;
 	}
 
@@ -194,7 +184,7 @@ public class Parser {
 		ParserState parserState,
 		Symbol symbol
 	) {
-		System.out.println("\t\t\t\t\tStarting addParserStateToCanonicalCollection: ");
+		Helper.printEntering("addParserStateToCanonicalCollection");
 		ParserState destinationState
 		= parserState.transition(symbol, productionMap);
 		if (canonicalCollection.add(destinationState)) {
@@ -205,22 +195,23 @@ public class Parser {
 				parserState, new HashMap<Symbol, ParserState>()
 			);
 		}
-		System.out.println("SYMBOL SHOULD BE SOMETHING:  " + symbol);
-		System.out.println("DeSTINATION:  " + destinationState);
 		parserStateTransitionMap.get(parserState).put(symbol, destinationState);
-		System.out.println("\t\t\t\t\tFinishing addParserStateToCanonicalCollection: ");
+		Helper.printExiting("addParserStateToCanonicalCollection");
 	}
 
 	private void initializeActionTable() {
+		Helper.printEntering("initializeActionTable");
 		actionTable	= new HashMap<ParserState, HashMap<Symbol, Action>>();
 		for (ParserState parserState : canonicalCollection) {
 			for (Item item : parserState.getItemSet()) {
 				addActionToActionTable(parserState, item);
 			}
 		}
+		Helper.printExiting("initializeActionTable");
 	}
 
 	private void addActionToActionTable(ParserState parserState, Item item) {
+		Helper.printEntering("addActionToActionTable");
 		HashMap<Symbol, Action> symbolActionMap = actionTable.get(parserState);
 		if (symbolActionMap == null) {
 			symbolActionMap = new HashMap<Symbol, Action>();
@@ -228,7 +219,7 @@ public class Parser {
 		}
 
 		Symbol nextSymbol = item.getNextSymbol();
-		if (nextSymbol == null /*|| nextSymbol.equals(ParserConstants.EPSILON)*/) {
+		if (nextSymbol == null) {
 			Symbol lookAheadSymbol = item.getLookAheadSymbol();
 			if (item.getReduction().equals(ParserConstants.GOAL)) {
 				if (lookAheadSymbol.equals(ParserConstants.EOF)) {
@@ -249,6 +240,12 @@ public class Parser {
 			ParserState destinationState
 			= parserStateTransitionMap.get(parserState).get(nextSymbol);
 			if (destinationState != null) {
+				List<Symbol> suffix = item.getSuffix();
+				int i = 0;
+				while (nextSymbol.equals(ParserConstants.EPSILON)
+				&& i < suffix.size()) {
+					nextSymbol = suffix.get(i++);
+				}
 				if (nextSymbol.equals(ParserConstants.EPSILON)) {
 					nextSymbol = item.getLookAheadSymbol();
 				}
@@ -256,9 +253,11 @@ public class Parser {
 				symbolActionMap.put(nextSymbol, new Shift(destinationState));
 			}
 		}
+		Helper.printExiting("addActionToActionTable");
 	}
 
 	public AbstractSyntaxTree parse(Deque<Token> tokenQueue) {
+		Helper.printEntering("parse");
 		parseTreeNodeStack = new ArrayDeque<ParseTreeNode>();
 		parserStateStack = new ArrayDeque<ParserState>();
 		abstractSyntaxTreeNodeListStack =
@@ -273,11 +272,11 @@ public class Parser {
 			parserState = parserStateStack.peek();
 			action
 			= actionTable.get(parserState).get(lookAheadNode.getSymbol());
-			System.out.println("\nACTION STUFF");
-			System.out.println(parserState);
-			System.out.println(actionTable.get(parserState));
-			System.out.println(lookAheadNode.getSymbol());
-			System.out.println(action);
+			Helper.print("\nACTION STUFF");
+			Helper.print(parserState + "");
+			Helper.print(actionTable.get(parserState) + "");
+			Helper.print(lookAheadNode.getSymbol() + "");
+			Helper.print(action + "");
 			try {
 				shiftOrReduce(tokenQueue, action);
 			}
@@ -288,19 +287,21 @@ public class Parser {
 		}
 		Reduce reduceAction = (Reduce)action;
 		reduce(reduceAction.getReduction(), reduceAction.getHandle());
-		System.out.println("Parse Tree: " + new ParseTree(parseTreeNodeStack.pop()));
-		System.out.println("SIZE: " + abstractSyntaxTreeNodeListStack.size());
+		Helper.print("Parse Tree: " + new ParseTree(parseTreeNodeStack.pop()));
+		Helper.printExiting("parse");
 		return new AbstractSyntaxTree(abstractSyntaxTreeNodeListStack.pop());
-		// return new ParseTree(parseTreeNodeStack.pop());
 	}
 
 	private ParseTreeNode buildNextParseTreeNode(Deque<Token> tokenQueue) {
+		Helper.printEntering("buildNextParseTreeNode");
+		Helper.printExiting("buildNextParseTreeNode");
 		return tokenQueue.peek() == null ?
 		new ParseTreeNode(ParserConstants.EOF)
 		: new ParseTreeNode(tokenQueue.poll());
 	}
 
 	private void shiftOrReduce(Deque<Token> tokenQueue, Action action) {
+		Helper.printEntering("shiftOrReduce");
 		if (action instanceof Accept) {
 			return;
 		}
@@ -315,9 +316,11 @@ public class Parser {
 			Reduce reduceAction = (Reduce)action;
 			reduce(reduceAction.getReduction(), reduceAction.getHandle());
 		}
+		Helper.printExiting("shiftOrReduce");
 	}
 
 	private void shift(ParserState destinationState, Deque<Token> tokenQueue) {
+		Helper.printEntering("shift");
 		parseTreeNodeStack.push(lookAheadNode);
 		parserStateStack.push(destinationState);
 		int lineNumber = -1;
@@ -327,9 +330,11 @@ public class Parser {
 			)
 		);
 		lookAheadNode = buildNextParseTreeNode(tokenQueue);
+		Helper.printExiting("shift");
 	}
 
 	private void reduce(NonTerminal reduction, Handle handle) {
+		Helper.printEntering("reduce");
 		Deque<ParseTreeNode> children = new ArrayDeque<ParseTreeNode>();
 		int[] nodeArray = new int[handle.getSize()];
 		for (int i = 0; i < handle.getSize(); i++) {
@@ -347,9 +352,11 @@ public class Parser {
 		if (instruction != null) {
 			reduceAbstractSyntaxTreeNodeListStack(instruction);
 		}
+		Helper.printExiting("reduce");
 	}
 
 	private void reduceAbstractSyntaxTreeNodeListStack(String instruction) {
+		Helper.printEntering("reduceAbstractSyntaxTreeNodeListStack");
 		String[] splitInstruction = instruction.split(" ");
 		LinkedList<Node>[] nodeArray
 		= new LinkedList[splitInstruction.length - 1];
@@ -365,6 +372,7 @@ public class Parser {
 		if (nodeList != null) {
 			abstractSyntaxTreeNodeListStack.push(nodeList);
 		}
+		Helper.printEntering("reduceAbstractSyntaxTreeNodeListStack");
 	}
 
 	private LinkedList<Node> buildNodeList(
@@ -372,17 +380,21 @@ public class Parser {
 		LinkedList<Node>[] nodeArray,
 		int[] nodeIndexArray
 	) {
+		Helper.printEntering("buildNodeList");
 		String type = splitInstruction[0];
 		switch (type) {
 			case ParserConstants.LIST:
 			if (nodeIndexArray.length == 0) {
+				Helper.printExiting("buildNodeList");
 				return new LinkedList<Node>();
 			}
 			LinkedList<Node> listBranch = nodeArray[nodeIndexArray[0]];
 			LinkedList<Node> nodeBranch = nodeArray[nodeIndexArray[1]];
+			Helper.printExiting("buildNodeList");
 			return Node.extendListWithNode(listBranch, nodeBranch);
 
 			case ParserConstants.NULL:
+			Helper.printExiting("buildNodeList");
 			return null;
 
 			case ParserConstants.EVALUATION:
@@ -391,15 +403,15 @@ public class Parser {
 			for (int i = 1; i < splitInstruction.length - 1; i++) {
 				argumentsBranch.addAll(nodeArray[nodeIndexArray[i]]);
 			}
+			Helper.printExiting("buildNodeList");
 			return Node.buildSingleton(symbolNode, argumentsBranch);
 
 			case ParserConstants.CONDITIONAL:
 			symbolNode = nodeArray[nodeIndexArray[0]].get(0);
 			LinkedList<Node> evaluationsBranch = nodeArray[nodeIndexArray[1]];
-			System.out.println("evaluations branch:" + evaluationsBranch);
 			LinkedList<Node> expressionsBranch = nodeArray[nodeIndexArray[2]];
-			System.out.println("expressions branch:" + expressionsBranch);
 			expressionsBranch.addAll(nodeArray[nodeIndexArray[3]]);
+			Helper.printExiting("buildNodeList");
 			return Node.buildSingleton(
 				symbolNode, evaluationsBranch, expressionsBranch
 			);
@@ -408,33 +420,37 @@ public class Parser {
 			symbolNode = nodeArray[nodeIndexArray[0]].get(0);
 			evaluationsBranch = nodeArray[nodeIndexArray[1]];
 			expressionsBranch = nodeArray[nodeIndexArray[2]];
+			Helper.printExiting("buildNodeList");
 			return Node.buildSingleton(
 				symbolNode, evaluationsBranch, expressionsBranch
 			);
 
 			case ParserConstants.VARIABLE:
 			symbolNode = nodeArray[nodeIndexArray[0]].get(0);
-			// symbolNode.setAnnotation(ParserConstants.NEW_VARIABLE);
 			LinkedList<Node> dataTypeBranch = nodeArray[nodeIndexArray[1]];
 			LinkedList<Node> variableBranch = Node.buildSingleton(
 				symbolNode, ParserConstants.NEW_VARIABLE, dataTypeBranch
 			);
 			if (nodeIndexArray.length == 2) {
+				Helper.printExiting("buildNodeList");
 				return variableBranch;
 			}
 			evaluationsBranch = nodeArray[nodeIndexArray[2]];
+			Helper.printExiting("buildNodeList");
 			return Node.extendListWithNode(variableBranch, evaluationsBranch);
 
 			case ParserConstants.ARRAY:
 			symbolNode = nodeArray[nodeIndexArray[0]].get(0);
-			// symbolNode.setAnnotation(ParserConstants.NEW_ARRAY);
 			Node operatorNode = nodeArray[nodeIndexArray[1]].get(0);
 			LinkedList<Node> dimensionsBranch = nodeArray[nodeIndexArray[2]];
 			evaluationsBranch = nodeArray[nodeIndexArray[3]];
 			LinkedList<Node> operatorBranch = Node.buildSingleton(
 				operatorNode, dimensionsBranch, evaluationsBranch
 			);
-			return Node.buildSingleton(symbolNode, ParserConstants.NEW_ARRAY, operatorBranch);
+			Helper.printExiting("buildNodeList");
+			return Node.buildSingleton(
+				symbolNode, ParserConstants.NEW_ARRAY, operatorBranch
+			);
 
 			case ParserConstants.FUNCTION:
 			symbolNode = nodeArray[nodeIndexArray[0]].get(0);
@@ -443,6 +459,7 @@ public class Parser {
 			LinkedList<Node> parametersBranch = nodeArray[nodeIndexArray[2]];
 			expressionsBranch = nodeArray[nodeIndexArray[3]];
 			expressionsBranch.addAll(nodeArray[nodeIndexArray[4]]);
+			Helper.printExiting("buildNodeList");
 			return Node.buildSingleton(
 				symbolNode,
 				ParserConstants.NEW_FUNCTION,
@@ -454,9 +471,12 @@ public class Parser {
 			case ParserConstants.IDENTIFIER:
 			symbolNode = nodeArray[nodeIndexArray[0]].get(0);
 			symbolNode.setAnnotation(ParserConstants.CHECK_IDENTIFIER);
+			Helper.printExiting("buildNodeList");
 			return null;
 
-			default: return null;
+			default:
+			Helper.printExiting("buildNodeList");
+			return null;
 		}
 	}
 }

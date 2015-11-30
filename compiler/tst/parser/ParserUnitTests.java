@@ -22,27 +22,16 @@ public class ParserUnitTests {
 		// printResult(ParserComplexValidTest());
 		// printResult(ParserActualInvalidTest());
 		// printResult(ParserActualValidTest());
-		test();
+		visualTest();
 	}
 
-	public static void test() {
+	public static void visualTest() {
 		AbstractSyntaxTree tree;
 		Token token;
 		Deque<Token> tokenQueue = new ArrayDeque<Token>();
-		Parser parser = new Parser("./input/parser/SimpleGrammar.txt");
+		Parser parser = new Parser("./input/parser/ComplexGrammar.txt");
 
-		token = new Token("1", "Identifier");
-		tokenQueue.offer(token);
-		token = new Token("2", "Identifier");
-		tokenQueue.offer(token);
-		token = new Token("3", "Identifier");
-		tokenQueue.offer(token);
-
-		tree = parser.parse(tokenQueue);
-		System.out.println("\nTREE:\n" + tree);
-		System.out.println("Symbol Table: " + tree.getSymbolTable());
-		//
-		// token = new Token("op1", "Operator");
+		// token = new Token("1", "Identifier");
 		// tokenQueue.offer(token);
 		// token = new Token("2", "Identifier");
 		// tokenQueue.offer(token);
@@ -52,90 +41,87 @@ public class ParserUnitTests {
 		// tree = parser.parse(tokenQueue);
 		// System.out.println("\nTREE:\n" + tree);
 		// System.out.println("Symbol Table: " + tree.getSymbolTable());
-		//
-		// token = new Token("if1", "IfSymbol");
-		// tokenQueue.offer(token);
-		// token = new Token("2", "Identifier");
-		// tokenQueue.offer(token);
-		// token = new Token("exp3", "Expressions");
-		// tokenQueue.offer(token);
-		// token = new Token("return4", "ReturnExpression");
-		// tokenQueue.offer(token);
-		//
-		// tree = parser.parse(tokenQueue);
-		// System.out.println("\nTREE:\n" + tree);
-		// System.out.println("Symbol Table: " + tree.getSymbolTable());
-		//
-		// token = new Token("while1", "WhileSymbol");
-		// tokenQueue.offer(token);
-		// token = new Token("2", "Identifier");
-		// tokenQueue.offer(token);
-		// token = new Token("exp3", "Expressions");
-		// tokenQueue.offer(token);
-		//
-		// tree = parser.parse(tokenQueue);
-		// System.out.println("\nTREE:\n" + tree);
-		// System.out.println("Symbol Table: " + tree.getSymbolTable());
-		//
-		// token = new Token("1", "Identifier");
-		// tokenQueue.offer(token);
-		// token = new Token("int2", "DataType");
-		// tokenQueue.offer(token);
-		//
-		// tree = parser.parse(tokenQueue);
-		// System.out.println("\nTREE:\n" + tree);
-		// System.out.println("Symbol Table: " + tree.getSymbolTable());
-		//
-		// token = new Token("arr1", "Identifier");
-		// tokenQueue.offer(token);
-		// token = new Token(".2", "ArraySymbol");
-		// tokenQueue.offer(token);
-		// token = new Token("int3", "DataType");
-		// tokenQueue.offer(token);
-		// token = new Token("4", "Evaluation");
-		// tokenQueue.offer(token);
-		//
-		// tree = parser.parse(tokenQueue);
-		// System.out.println("\nTREE:\n" + tree);
-		// System.out.println("Symbol Table: " + tree.getSymbolTable());
-		//
-		// token = new Token("fun1", "Identifier");
-		// tokenQueue.offer(token);
-		// token = new Token("int2", "DataType");
-		// tokenQueue.offer(token);
-		// token = new Token("par3", "Identifier");
-		// tokenQueue.offer(token);
-		// token = new Token("int3.1", "DataType");
-		// tokenQueue.offer(token);
-		// token = new Token("exp4", "Expressions");
-		// tokenQueue.offer(token);
-		// token = new Token("ret5", "ReturnExpression");
-		// tokenQueue.offer(token);
-		//
-		// tree = parser.parse(tokenQueue);
-		// System.out.println("\nTREE:\n" + tree);
-		// System.out.println("Symbol Table: " + tree.getSymbolTable());
-		//
+
+		token = new Token("op1", "Operator");
+		tokenQueue.offer(token);
+		token = new Token("2", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("3", "Identifier");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+		System.out.println("Symbol Table: " + tree.getSymbolTable());
+
+		token = new Token("if1", "IfSymbol");
+		tokenQueue.offer(token);
+		token = new Token("2", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("exp3", "Expressions");
+		tokenQueue.offer(token);
+		token = new Token("return4", "ReturnExpression");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+		System.out.println("Symbol Table: " + tree.getSymbolTable());
+
+		token = new Token("while1", "WhileSymbol");
+		tokenQueue.offer(token);
+		token = new Token("2", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("exp3", "Expressions");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+		System.out.println("Symbol Table: " + tree.getSymbolTable());
+
+		token = new Token("1", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("int2", "DataType");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+		System.out.println("Symbol Table: " + tree.getSymbolTable());
+
+		token = new Token("arr1", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token(".2", "ArraySymbol");
+		tokenQueue.offer(token);
+		token = new Token("int3", "DataType");
+		tokenQueue.offer(token);
+		token = new Token("4", "Evaluation");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+		System.out.println("Symbol Table: " + tree.getSymbolTable());
+
+		token = new Token("fun1", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("int2", "DataType");
+		tokenQueue.offer(token);
+		token = new Token("par3", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("int3.1", "DataType");
+		tokenQueue.offer(token);
+		token = new Token("exp4", "Expressions");
+		tokenQueue.offer(token);
+		token = new Token("ret5", "ReturnExpression");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+		System.out.println("Symbol Table: " + tree.getSymbolTable());
+
 		// token = new Token("id1", "Identifier");
 		// tokenQueue.offer(token);
 		//
 		// tree = parser.parse(tokenQueue);
 		// System.out.println("\nTREE:\n" + tree);
 		// System.out.println("Symbol Table: " + tree.getSymbolTable());
-
-		// case ParserConstants.EMPTY:
-		//
-		// case ParserConstants.NULL:
-		//
-		// case ParserConstants.VARIABLE:
-		//
-		// case ParserConstants.ARRAY:
-		//
-		// case ParserConstants.FUNCTION:
-		//
-		// case ParserConstants.IDENTIFIER:
-		//
-		// default: return null;
 	}
 
 	//
