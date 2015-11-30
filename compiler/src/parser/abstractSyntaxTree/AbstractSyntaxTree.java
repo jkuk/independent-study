@@ -73,7 +73,6 @@ public class AbstractSyntaxTree {
 	public SymbolTable getSymbolTable() {
 		return symbolTable;
 	}
-
 	public String toString() {
 		Deque<Node> nodeStack = new ArrayDeque<Node>();
 
