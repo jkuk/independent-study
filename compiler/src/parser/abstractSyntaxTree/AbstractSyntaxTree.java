@@ -37,19 +37,19 @@ public class AbstractSyntaxTree {
 		LinkedList<String> scopeNameList = new LinkedList<String>();
 		Deque<Node> nodeStack = new ArrayDeque<Node>();
 		Deque<Integer> depthStack = new ArrayDeque<Integer>();
-		depthStack.push(-1);
+		depthStack.offer(-1);
 
 		for (Node root : rootBranch) {
-			nodeStack.push(root);
+			nodeStack.offer(root);
 		}
 		while (!nodeStack.isEmpty()) {
-			Node node = nodeStack.pop();
+			Node node = nodeStack.poll();
 			while (node.getDepth() <= depthStack.peek()) {
-				depthStack.pop();
+				depthStack.poll();
 				scopeNameList.removeLast();
 			}
 			for (Node child : node.getChildren()) {
-				nodeStack.push(child);
+				nodeStack.offer(child);
 			}
 			if (node.getAnnotation() == ParserConstants.CHECK_IDENTIFIER
 			&& !symbolTable.contains(node.getLexeme())) {
@@ -59,7 +59,7 @@ public class AbstractSyntaxTree {
 				String scope = symbolTable.addSymbol(node, scopeNameList);
 				if (scope != null) {
 					scopeNameList.addLast(scope);
-					depthStack.push(node.getDepth());
+					depthStack.offer(node.getDepth());
 				}
 			}
 		}
@@ -75,14 +75,16 @@ public class AbstractSyntaxTree {
 
 	public String toString() {
 		Deque<Node> nodeStack = new ArrayDeque<Node>();
-		for (Node root : rootBranch) {
-			nodeStack.push(root);
+		for (int i = rootBranch.size() - 1; i >= 0; i--) {
+			nodeStack.push(rootBranch.get(i));
 		}
 		String string = "";
 		while (!nodeStack.isEmpty()) {
 			Node node = nodeStack.pop();
-			for (Node child : node.getChildren()) {
-				nodeStack.push(child);
+			// for (Node child : node.getChildren()) {
+			LinkedList<Node> children = node.getChildren();
+			for (int i = children.size() - 1; i >= 0; i--) {
+				nodeStack.push(children.get(i));
 			}
 			for (int i = 0; i < node.getDepth(); i++) {
 				string += "  ";

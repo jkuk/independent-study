@@ -1,4 +1,4 @@
-goal -> list | evaluation | conditional | loop | variable | array | function | identifier
+goal -> list | evaluation | conditional | loop | variable | array | function | variable identifier
 : null | null | null | null | null | null | null | null
 
 list -> list Identifier | Epsilon
@@ -22,5 +22,5 @@ array -> Identifier ArraySymbol DataType Evaluation
 function -> Identifier DataType variable Expressions ReturnExpression
 : function 0 1 2 3 4
 
-identifier -> Identifier
+identifier -> IdentifierLower
 : identifier 0

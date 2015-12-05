@@ -219,7 +219,19 @@ public class Parser {
 		}
 
 		Symbol nextSymbol = item.getNextSymbol();
-		if (nextSymbol == null) {
+		/*
+		List<Symbol> suffix = item.getSuffix();
+		int i = 0;
+		while (nextSymbol.equals(ParserConstants.EPSILON)
+		&& i < suffix.size()) {
+			nextSymbol = suffix.get(i++);
+		}
+		if (nextSymbol.equals(ParserConstants.EPSILON)) {
+			nextSymbol = item.getLookAheadSymbol();
+		}*/
+		if (nextSymbol == null/*
+		|| nextSymbol.equals(ParserConstants.EPSILON)
+		|| nextSymbol.equals(ParserConstants.EOF)*/) {
 			Symbol lookAheadSymbol = item.getLookAheadSymbol();
 			if (item.getReduction().equals(ParserConstants.GOAL)) {
 				if (lookAheadSymbol.equals(ParserConstants.EOF)) {
@@ -240,15 +252,28 @@ public class Parser {
 			ParserState destinationState
 			= parserStateTransitionMap.get(parserState).get(nextSymbol);
 			if (destinationState != null) {
-				List<Symbol> suffix = item.getSuffix();
-				int i = 0;
-				while (nextSymbol.equals(ParserConstants.EPSILON)
-				&& i < suffix.size()) {
-					nextSymbol = suffix.get(i++);
-				}
-				if (nextSymbol.equals(ParserConstants.EPSILON)) {
-					nextSymbol = item.getLookAheadSymbol();
-				}
+				// List<Symbol> suffix = item.getSuffix();
+				// int i = 0;
+				// while (nextSymbol.equals(ParserConstants.EPSILON)
+				// && i < suffix.size()) {
+				// 	nextSymbol = suffix.get(i++);
+				// }
+				// if (nextSymbol.equals(ParserConstants.EPSILON)) {
+				// 	nextSymbol = item.getLookAheadSymbol();
+				// }
+				// if (nextSymbol.equals(ParserConstants.EPSILON)
+				// || nextSymbol.equals(ParserConstants.EOF)) {
+				// 	symbolActionMap.put(ParserConstants.EOF, new Reduce(item.getReduction(), item.getHandle()));
+				// }
+				// else {
+					symbolActionMap.put(nextSymbol, new Shift(destinationState));
+				// }
+			}
+		}
+		else {
+			ParserState destinationState
+			= parserStateTransitionMap.get(parserState).get(nextSymbol);
+			if (destinationState != null) {
 
 				symbolActionMap.put(nextSymbol, new Shift(destinationState));
 			}
@@ -272,13 +297,13 @@ public class Parser {
 			parserState = parserStateStack.peek();
 			action
 			= actionTable.get(parserState).get(lookAheadNode.getSymbol());
-			Helper.print("\nACTION STUFF");
-			Helper.print(parserState + "");
-			Helper.print(actionTable.get(parserState) + "");
-			Helper.print(lookAheadNode.getSymbol() + "");
-			Helper.print(action + "");
+			// Helper.print("ACTION STUFF");
+			// Helper.print(parserState + "");
+			// Helper.print(actionTable.get(parserState) + "");
+			// Helper.print(lookAheadNode.getSymbol() + "");
+			// Helper.print(action + "");
 			try {
-				shiftOrReduce(tokenQueue, action);
+				takeAction(tokenQueue, action);
 			}
 			catch (IllegalArgumentException e) {
 				e.printStackTrace();
@@ -287,8 +312,8 @@ public class Parser {
 		}
 		Reduce reduceAction = (Reduce)action;
 		reduce(reduceAction.getReduction(), reduceAction.getHandle());
-		Helper.print("Parse Tree: " + new ParseTree(parseTreeNodeStack.pop()));
 		Helper.printExiting("parse");
+		Helper.print("Parse Tree: " + new ParseTree(parseTreeNodeStack.pop()));
 		return new AbstractSyntaxTree(abstractSyntaxTreeNodeListStack.pop());
 	}
 
@@ -300,9 +325,11 @@ public class Parser {
 		: new ParseTreeNode(tokenQueue.poll());
 	}
 
-	private void shiftOrReduce(Deque<Token> tokenQueue, Action action) {
-		Helper.printEntering("shiftOrReduce");
+	private void takeAction(Deque<Token> tokenQueue, Action action) {
+		Helper.printEntering("takeAction");
+		// Helper.print(abstractSyntaxTreeNodeListStack.toString());
 		if (action instanceof Accept) {
+			Helper.printExiting("takeAction");
 			return;
 		}
 		else if (action == null) {
@@ -316,7 +343,8 @@ public class Parser {
 			Reduce reduceAction = (Reduce)action;
 			reduce(reduceAction.getReduction(), reduceAction.getHandle());
 		}
-		Helper.printExiting("shiftOrReduce");
+		// Helper.print(abstractSyntaxTreeNodeListStack.toString());
+		Helper.printExiting("takeAction");
 	}
 
 	private void shift(ParserState destinationState, Deque<Token> tokenQueue) {
@@ -324,7 +352,12 @@ public class Parser {
 		parseTreeNodeStack.push(lookAheadNode);
 		parserStateStack.push(destinationState);
 		int lineNumber = -1;
-		abstractSyntaxTreeNodeListStack.push(
+		// abstractSyntaxTreeNodeListStack.push(
+		// 	Node.buildSingleton(
+		// 		lookAheadNode.getLexeme(), lineNumber
+		// 	)
+		// );
+		abstractSyntaxTreeNodeListStack.offerLast(
 			Node.buildSingleton(
 				lookAheadNode.getLexeme(), lineNumber
 			)
@@ -363,16 +396,21 @@ public class Parser {
 		int[] nodeIndexArray = new int[splitInstruction.length - 1];
 
 		for (int i = 1; i < splitInstruction.length; i++) {
-			nodeArray[splitInstruction.length - i - 1] = abstractSyntaxTreeNodeListStack.pop();
+			nodeArray[splitInstruction.length - i - 1] = abstractSyntaxTreeNodeListStack.pollLast();
+			// nodeArray[i - 1] = abstractSyntaxTreeNodeListStack.pollLast();
+
 			nodeIndexArray[i - 1] = Integer.parseInt(splitInstruction[i]);
+
+				// nodeIndexArray[i - 1] = Integer.parseInt(splitInstruction[i]);
 		}
 
 		LinkedList<Node> nodeList
 		= buildNodeList(splitInstruction, nodeArray, nodeIndexArray);
 		if (nodeList != null) {
-			abstractSyntaxTreeNodeListStack.push(nodeList);
+			// abstractSyntaxTreeNodeListStack.push(nodeList);
+			abstractSyntaxTreeNodeListStack.offerLast(nodeList);
 		}
-		Helper.printEntering("reduceAbstractSyntaxTreeNodeListStack");
+		Helper.printExiting("reduceAbstractSyntaxTreeNodeListStack");
 	}
 
 	private LinkedList<Node> buildNodeList(
@@ -403,6 +441,9 @@ public class Parser {
 			for (int i = 1; i < splitInstruction.length - 1; i++) {
 				argumentsBranch.addAll(nodeArray[nodeIndexArray[i]]);
 			}
+			// for (int i = splitInstruction.length - 1; i > 0 ; i--) {
+			// 	argumentsBranch.addAll(nodeArray[nodeIndexArray[i]]);
+			// }
 			Helper.printExiting("buildNodeList");
 			return Node.buildSingleton(symbolNode, argumentsBranch);
 
@@ -432,7 +473,7 @@ public class Parser {
 				symbolNode, ParserConstants.NEW_VARIABLE, dataTypeBranch
 			);
 			if (nodeIndexArray.length == 2) {
-				Helper.printExiting("buildNodeList");
+				Helper.printExiting("buildNodeList: nodeIndexArray.length == 2");
 				return variableBranch;
 			}
 			evaluationsBranch = nodeArray[nodeIndexArray[2]];
@@ -472,7 +513,7 @@ public class Parser {
 			symbolNode = nodeArray[nodeIndexArray[0]].get(0);
 			symbolNode.setAnnotation(ParserConstants.CHECK_IDENTIFIER);
 			Helper.printExiting("buildNodeList");
-			return null;
+			return nodeArray[nodeIndexArray[0]];
 
 			default:
 			Helper.printExiting("buildNodeList");

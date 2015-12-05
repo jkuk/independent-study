@@ -31,16 +31,16 @@ public class ParserUnitTests {
 		Deque<Token> tokenQueue = new ArrayDeque<Token>();
 		Parser parser = new Parser("./input/parser/ComplexGrammar.txt");
 
-		// token = new Token("1", "Identifier");
-		// tokenQueue.offer(token);
-		// token = new Token("2", "Identifier");
-		// tokenQueue.offer(token);
-		// token = new Token("3", "Identifier");
-		// tokenQueue.offer(token);
-		//
-		// tree = parser.parse(tokenQueue);
-		// System.out.println("\nTREE:\n" + tree);
-		// System.out.println("Symbol Table: " + tree.getSymbolTable());
+		token = new Token("1", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("2", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("3", "Identifier");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+		System.out.println("Symbol Table: " + tree.getSymbolTable());
 
 		token = new Token("op1", "Operator");
 		tokenQueue.offer(token);
@@ -116,12 +116,16 @@ public class ParserUnitTests {
 		System.out.println("\nTREE:\n" + tree);
 		System.out.println("Symbol Table: " + tree.getSymbolTable());
 
-		// token = new Token("id1", "Identifier");
-		// tokenQueue.offer(token);
-		//
-		// tree = parser.parse(tokenQueue);
-		// System.out.println("\nTREE:\n" + tree);
-		// System.out.println("Symbol Table: " + tree.getSymbolTable());
+		token = new Token("var1", "Identifier");
+		tokenQueue.offer(token);
+		token = new Token("int2", "DataType");
+		tokenQueue.offer(token);
+		token = new Token("var1", "IdentifierLower");
+		tokenQueue.offer(token);
+
+		tree = parser.parse(tokenQueue);
+		System.out.println("\nTREE:\n" + tree);
+		System.out.println("Symbol Table: " + tree.getSymbolTable());
 	}
 
 	//

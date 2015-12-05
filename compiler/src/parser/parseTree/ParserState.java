@@ -32,6 +32,7 @@ public class ParserState {
 		return itemSet;
 	}
 
+
 	public ParserState buildClosure(
 		Map<NonTerminal, ArrayList<Handle>> productionMap
 	) {
@@ -42,18 +43,58 @@ public class ParserState {
 		while (closure.size() != previousSize) {
 			previousSize = closure.size();
 			Set<Item> itemSet = new HashSet<Item>();
-			for (Item item : closure) {
+			for (Item item : closure) { // change this into a worklist -- unprocessed items
 				Symbol nextSymbol = item.getNextSymbol();
-				if (nextSymbol != null && nextSymbol instanceof NonTerminal) {
+				if (nextSymbol instanceof NonTerminal) {
 					List<Symbol> suffix
 					= new ArrayList<Symbol>(item.getSuffix());
 					suffix.add(item.getLookAheadSymbol());
 
-					itemSet.addAll(
-						buildItemsInClosure(
-							(NonTerminal)nextSymbol, suffix, productionMap
-						)
-					);
+					for (Handle handle : productionMap.get(nextSymbol)) {
+						for (Terminal lookAheadSymbol
+						: buildLookAheadSymbolSet(suffix, productionMap)) {
+
+							if (ParserConstants.EPSILON
+							.equals(handle.getFirstSymbol())) {
+								Handle epsilonNonTerminalHandle
+								= item.getHandle().removeFirstSymbol();
+
+								if (lookAheadSymbol
+								.equals(ParserConstants.EPSILON)) {
+									itemSet.add(
+										new Item(
+											(NonTerminal)nextSymbol,
+											epsilonNonTerminalHandle,
+											item.getLookAheadSymbol()
+										)
+									);
+								}
+								else {
+									itemSet.add(
+										new Item(
+											(NonTerminal)nextSymbol,
+											epsilonNonTerminalHandle,
+											lookAheadSymbol
+										)
+									);
+								}
+							}
+							else {
+								itemSet.add(
+									new Item(
+										(NonTerminal)nextSymbol,
+										handle,
+										lookAheadSymbol
+									)
+								);
+								// itemSet.addAll(
+								// 	buildItemsInClosure(
+								// 		(NonTerminal)nextSymbol, item, productionMap
+								// 	)
+								// );
+							}
+						}
+					}
 				}
 			}
 			closure.addAll(itemSet);
@@ -61,20 +102,45 @@ public class ParserState {
 		return new ParserState(closure);
 	}
 
-	private Set<Item> buildItemsInClosure(
-		NonTerminal reduction,
-		List<Symbol> suffix,
-		Map<NonTerminal, ArrayList<Handle>> productionMap
-	) {
-		Set<Item> itemSet = new HashSet<Item>();
-		for (Handle handle : productionMap.get(reduction)) {
-			for (Terminal lookAheadSymbol
-			: buildLookAheadSymbolSet(suffix, productionMap)) {
-				itemSet.add(new Item(reduction, handle, lookAheadSymbol));
-			}
-		}
-		return itemSet;
-	}
+	// private Set<Item> buildItemsInClosure(
+	// 	NonTerminal reduction,
+	// 	Item item,
+	// 	Map<NonTerminal, ArrayList<Handle>> productionMap
+	// ) {
+	// 	List<Symbol> suffix
+	// 	= new ArrayList<Symbol>(item.getSuffix());
+	// 	suffix.add(item.getLookAheadSymbol());
+	// 	Set<Item> itemSet = new HashSet<Item>();
+	// 	for (Handle handle : productionMap.get(reduction)) {
+	// 		for (Terminal lookAheadSymbol
+	// 		: buildLookAheadSymbolSet(suffix, productionMap)) {
+	// 			if (ParserConstants.EPSILON.equals(handle.getFirstSymbol())) {
+	// 				compiler.Helper.print("EPSILON: " + lookAheadSymbol);
+	// 				for (Handle handle : productionMap.get(reduction)) {
+	// 					if (ParserConstants.EPSILON.equals(handle.getFirstSymbol())) {
+	// 				}
+	// 				if lookAheadSymbol.equals(ParserConstants.EPSILON)) {
+	// 					itemSet.add(new Item(reduction, something, item.getLookAheadSymbol));
+	// 				}
+	// 				else {
+	//
+	// 					itemSet.add(new Item(reduction, something, lookAheadSymbol));
+	// 				}
+	// 			}
+	// 			// if i come across an epsilon handle
+	// 			// replace the item handle with null
+	// 			// if (reduction.toString().equals("list")) {
+	// 			// 	compiler.Helper.print("here : " + new Item(reduction, handle, lookAheadSymbol));
+	// 			// }
+	// 			else {
+	// 				itemSet.add(new Item(reduction, handle, lookAheadSymbol));
+	// 			}
+	// 		}
+	// 	}
+	// 	// itemSet.addAll();
+	// 	// return if handle is epsilon
+	// 	return itemSet;
+	// }
 
 	private Set<Terminal> buildLookAheadSymbolSet(
 		List<Symbol> symbolList,

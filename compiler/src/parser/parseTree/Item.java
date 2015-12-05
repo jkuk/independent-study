@@ -26,7 +26,7 @@ public class Item {
 		this(
 			reduction,
 			symbolsSeen,
-			handle.getSymbolList().get(0),
+			handle.getFirstSymbol(),
 			new ArrayList<Symbol>(),
 			lookAheadSymbol
 		);
@@ -46,6 +46,9 @@ public class Item {
 		this.reduction = reduction;
 		this.symbolsSeen = symbolsSeen;
 		this.nextSymbol = nextSymbol;
+		if (ParserConstants.EPSILON.equals(nextSymbol)) {
+			this.nextSymbol = null;
+		}
 		this.suffix = suffix;
 		this.lookAheadSymbol = lookAheadSymbol;
 	}
@@ -66,7 +69,7 @@ public class Item {
 		return suffix;
 	}
 
-	public Symbol getLookAheadSymbol() {
+	public Terminal getLookAheadSymbol() {
 		return lookAheadSymbol;
 	}
 
@@ -78,12 +81,22 @@ public class Item {
 	}
 
 	public Handle getHandle() {
-		return new Handle(symbolsSeen);
+		List<Symbol> symbolList = new ArrayList<Symbol>(symbolsSeen);
+		if (nextSymbol != null) {
+			symbolList.add(nextSymbol);
+		}
+		for (Symbol symbol : suffix) {
+			symbolList.add(symbol);
+		}
+		return new Handle(symbolList);
+		// return new Handle(symbolsSeen);
 	}
 
 	public Item recognizeNextSymbol() {
 		List<Symbol> symbolsSeen = new ArrayList<Symbol>(this.symbolsSeen);
-		symbolsSeen.add(nextSymbol);
+		if (nextSymbol != null) {
+			symbolsSeen.add(nextSymbol);
+		}
 		if (suffix.size() == 0) {
 			return new Item(
 				reduction, symbolsSeen, null, new ArrayList<Symbol>(), lookAheadSymbol

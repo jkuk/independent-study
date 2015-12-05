@@ -22,7 +22,7 @@ public class Helper {
 
 	public static void print(String string) {
 		if (debugMode) {
-			System.out.println("=> " + string + "<=\n");
+			System.out.println("=>" + string + "<=\n");
 		}
 	}
 
