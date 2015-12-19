@@ -1,0 +1,43 @@
+: a Integer 1;
+: a 2;
+: a + a 4;
+: a ~ 5;
+
+: b String "b";
+: d String _ b 'c';
+
+: arr1 . Integer 3;
+: arr2 . . String 5 7;
+: val Integer . arr1 1;
+: val1 String . . arr2 2 a;
+
+: Fun1 None [
+	: a Integer 7;
+];
+
+: Fasd Integer [
+	: b String 'dofjsdfjoisdjf';
+	^ 5;
+];
+
+: Qwert String argc Integer argv String [
+	: b String 'dofjsdfjoisdjf';
+	^ b;
+];
+
+? < 4 5 [
+	: b 'dofjsdfjoisdjf';
+	^ b;
+];
+
+? < > = 2 3 4 5 [
+	: b 'dofjsdfjoisdjf';
+];
+
+! > 0 1 [
+	: a Fasd[];
+];
+
+! > 0 1 [
+	: b Qwert [ 5 "this" ];
+];

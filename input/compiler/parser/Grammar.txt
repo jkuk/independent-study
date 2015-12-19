@@ -1,0 +1,46 @@
+goal -> expressions
+: null
+
+expressions -> expressions expression EndOfLine | expression EndOfLine
+: list 0 1 | list 0
+
+expression -> definition | evaluation | branch
+: null | null | null
+
+definition -> AssignmentOperator variable | AssignmentOperator array | AssignmentOperator function
+: declare_or_initialize 0 1 | declare_or_initialize 0 1 | declare_or_initialize 0 1
+evaluation -> numericEvaluation | stringEvaluation | variableIdentifier | constantIdentifier | indexEvaluation | functionEvaluation
+: null | null | null | null | null | null
+branch -> IfSymbol evaluation OpeningBracket expressions ClosingBracket | IfSymbol evaluation OpeningBracket expressions returnExpression ClosingBracket | WhileSymbol evaluation OpeningBracket expressions ClosingBracket
+: conditional 0 1 3 | conditional 0 1 3 4 | loop 0 1 3
+
+variable -> variableIdentifier constantIdentifier evaluation | variableIdentifier evaluation
+: declare_and_initialize_variable 0 1 2 | initialize_variable 0 1
+array -> variableIdentifier dimensions
+: declare_array 0 1
+function -> constantIdentifier constantIdentifier parameters OpeningBracket expressions ClosingBracket | constantIdentifier constantIdentifier parameters OpeningBracket expressions returnExpression ClosingBracket | constantIdentifier constantIdentifier OpeningBracket expressions ClosingBracket | constantIdentifier constantIdentifier OpeningBracket expressions returnExpression ClosingBracket
+: declare_and_initialize_function 0 1 2 4 | declare_and_initialize_function 0 1 2 4 5 | declare_and_initialize_function_no_parameters 0 1 3 | declare_and_initialize_function_no_parameters 0 1 3 4
+returnExpression -> ReturnSymbol evaluation EndOfLine
+: evaluation 0 1
+numericEvaluation -> Number | NumericUnaryOperator evaluation | NumericBinaryOperator evaluation evaluation
+: call_number 0 | evaluation 0 1 | evaluation 0 1 2
+stringEvaluation -> String | AlphabeticBinaryOperator evaluation evaluation
+: call_string 0 | evaluation 0 1 2
+variableIdentifier -> IdentifierLower
+: call_variable 0
+constantIdentifier -> IdentifierUpper
+: call_variable 0
+indexEvaluation -> ArraySymbol indexEvaluation evaluation | ArraySymbol variableIdentifier evaluation
+: call_array 0 1 2 | call_array 0 1 2
+functionEvaluation -> constantIdentifier OpeningBracket arguments ClosingBracket | constantIdentifier OpeningBracket ClosingBracket
+: call_function 0 2 | call_function_no_arguments 0
+
+dimensions -> ArraySymbol dimensions evaluation | ArraySymbol constantIdentifier evaluation
+: evaluation 0 1 2 | evaluation 0 1 2
+parameters -> parameters parameter | parameter
+: list 0 1 | list 0
+arguments -> arguments evaluation | evaluation
+: list 0 1 | list 0
+
+parameter -> variableIdentifier constantIdentifier
+: declare_variable 0 1

@@ -1,0 +1,42 @@
+: x '1'
+: yggsdrasil '2'
+: zzRot 3
+
+: x _ x yggdrasil
+: zzRot + zzRot zzRot
+: zzRot - zzRot 3
+: zzRot * / zzRot 1 4
+: zzRot % zzRot 7
+
+: equality = 3 5
+: equality < 4 7
+: equality > 6 7
+: equality <= 8 8
+: equality >= 9 9
+
+: equality & 1 0
+: equality | 1 1
+: equality ~ equality
+: equality # equality equality
+
+Function arg1 arg2 [
+	^ + arg1 arg2
+]
+
+? = 1 2 [
+	: equality 0
+] = 3 5 [
+	: equality 123
+] [
+	: equality 1
+]
+
+: i 10
+! > i 0 [
+	: i - i 1
+]
+
+: array1 . Integer 1
+: array2 .. String 2 3
+
+. array 0

@@ -1,0 +1,28 @@
+: Main Integer [
+	: a Integer 1;
+	: a + - a 4 * 5 2;
+
+	: b String "asdf";
+	: b _ _ b b 'qwert';
+	: arr1 . Integer 3;
+
+	: Fasd Integer [
+		: a 7;
+		^ 1;
+	];
+
+	: Fun1 Integer [
+		? < 4 5 [
+			? < 4 5 [
+				: b 'dofjsdfjoisdjf';
+			];
+			! = 0 1 [
+				: a 3;
+			];
+			: b 'swoop';
+			^ b;
+		];
+		^ 5;
+	];
+	^ 1;
+];
